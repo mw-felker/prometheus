@@ -7,48 +7,31 @@ import (
 	"net/http"
 )
 
+const resourceBaseURL = "https://www.hl7.org/fhir"
+
 func main() {
-	mapPatientJSONtoStruct()
-	fmt.Println(string(getEncounterJSON()))
+	newPatient := mapPatientJSONtoStruct()
+	fmt.Println("Mapped " + newPatient.ResourceType + " JSON to struct: " + newPatient.Gender + " " + newPatient.BirthDate)
+	encounterExample := string(getEncounterJSON())
+	fmt.Println("Retrieved Encounter shape from HL7 site")
+	fmt.Println(encounterExample)
 }
 
-/*
-func serveAPI() {
-	const port = ":4200"
-	router := mux.NewRouter().StrictSlash(true)
-
-	//patients = append(patients, Patient{UUID: uuid.NewString(), FirstName: "Max", LastName: "Felker"})
-	registerRoutes(router)
-
-	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(port, router))
-}
-
-func registerRoutes(router *mux.Router) {
-	router.HandleFunc("/Patients", getPatientHandler).Methods("GET")
-}
-
-
-func getPatientHandler(writer http.ResponseWriter, response *http.Request) {
-	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode(patients)
-}*/
-
-func mapPatientJSONtoStruct() {
+func mapPatientJSONtoStruct() Patient {
 	var newPatient Patient
 	patientJSON := getPatientJSON()
 	error := json.Unmarshal(patientJSON, &newPatient)
 	handleError(error)
-	fmt.Println(newPatient.ResourceType + " created: " + newPatient.Gender + " " + newPatient.BirthDate)
+	return newPatient
 }
 
 func getEncounterJSON() []byte {
-	const url string = "https://www.hl7.org/fhir/encounter-example.json"
+	const url string = resourceBaseURL + "/encounter-example.json"
 	return retrieveJSONData(url)
 }
 
 func getPatientJSON() []byte {
-	const url string = "https://www.hl7.org/fhir/patient-example.json"
+	const url string = resourceBaseURL + "/patient-example.json"
 	return retrieveJSONData(url)
 }
 
@@ -56,9 +39,6 @@ func retrieveJSONData(url string) []byte {
 	response, error := http.Get(url)
 	handleError(error)
 	defer response.Body.Close()
-
-	fmt.Println("Successfully retrieved " + url)
-
 	body, error := ioutil.ReadAll(response.Body)
 	handleError(error)
 	return body
