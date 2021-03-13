@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	models "github.com/mw-felker/prometheus/models"
 )
 
 const resourceBaseURL = "https://www.hl7.org/fhir"
@@ -19,8 +21,8 @@ func main() {
 	//fmt.Println(encounterExample)
 }
 
-func mapPatientJSONtoStruct() Patient {
-	var newPatient Patient
+func mapPatientJSONtoStruct() models.Patient {
+	var newPatient models.Patient
 	patientJSON := getPatientJSON()
 	error := json.Unmarshal(patientJSON, &newPatient)
 	handleError(error)
